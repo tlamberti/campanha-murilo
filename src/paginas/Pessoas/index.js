@@ -2,15 +2,17 @@ import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { Context } from '../../context';
 
-import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
+import { Paper, IconButton } from '@material-ui/core';
+import { Add, Close } from '@material-ui/icons';
+
+
 
 import Tabela from '../../componentes/Tabela';
-
+import Formulario from '../../componentes/Formulario'
 const Pessoas = () => {
 
   const { fetchLista, lista, setLista } = useContext(Context);
+  const [show, setShow] = useState(false);
   const [nome, setNome] = useState('');
   const [celular, setCelular] = useState('');
   const [escritoPor, setEscritoPor] = useState('');
@@ -65,36 +67,27 @@ const Pessoas = () => {
     }
   }
 
+  function handleShow() {
+    setShow(!show);
+  }
   return (
     <Paper>
-      <form onSubmit={cadastrarPessoa}>
-        <TextField 
-          value={nome}
-          label="Nome" 
-          onChange={e => manipulaInput(e.target.value, 'nome')}
-        />
-        <TextField 
-          value={celular}
-          label="Celular" 
-          onChange={e => manipulaInput(e.target.value, 'celular')}
-        />
-        <TextField 
-          value={escritoPor}
-          label="Escrito por" 
-          onChange={e => manipulaInput(e.target.value, 'escritoPor')}
-        />
-        <TextField 
-          value={local}
-          label="Local" 
-          onChange={e => manipulaInput(e.target.value, 'local')}
-        />
+      <IconButton onClick={handleShow}>
+        {show ? <Close /> : <Add color='primary' />}
+      </IconButton>
 
-        <Button 
-          type="submit"
-          variant="contained" 
-          color="primary">Enviar
-        </Button>
-      </form>
+      {show &&
+        <>
+          <Formulario 
+            nome={nome} 
+            celular={celular} 
+            escritoPor={escritoPor} 
+            local={local} 
+            manipulaInput={manipulaInput} 
+            cadastrarPessoa={cadastrarPessoa} 
+          />
+        </>
+      }
       <Tabela pessoas={lista}/>
   </Paper>
   )
