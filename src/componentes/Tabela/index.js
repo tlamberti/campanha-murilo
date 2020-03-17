@@ -9,7 +9,9 @@ import {
   TablePagination,
   TableRow,
   CircularProgress
-} from '@material-ui/core'
+} from '@material-ui/core';
+
+import './style.css';
 
 const columns = [
   { id: 'nome', label: 'Nome', minWidth: 170 },
@@ -45,7 +47,7 @@ export default function Tabela({ pessoas, isLoading }) {
   return (
     <>
       {pessoas && 
-        <>
+        <div class="tabela">
           <TableContainer>
             {isLoading && <CircularProgress />}
             <Table stickyHeader aria-label="sticky table">
@@ -89,7 +91,7 @@ export default function Tabela({ pessoas, isLoading }) {
             onChangePage={handleChangePage}
             onChangeRowsPerPage={handleChangeRowsPerPage}
           />
-        </>
+        </div>
       }
     </>
   )

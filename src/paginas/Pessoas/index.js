@@ -1,12 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Context } from '../../context';
 
-import { Paper, IconButton, Button } from '@material-ui/core';
+import { Paper, IconButton, Button, CircularProgress } from '@material-ui/core';
 import { Add, Close } from '@material-ui/icons';
 
 import Login from '../../componentes/Login';
 import Tabela from '../../componentes/Tabela';
 import Formulario from '../../componentes/Formulario';
+
+import './style.css';
+
 const Pessoas = () => {
   const { 
     fetchLista, 
@@ -40,15 +43,22 @@ const Pessoas = () => {
   }
 
   return (
-    <Paper>
+    <div>
+      {isLoading && <CircularProgress />}
       {
         user.loggedIn ?
           <>
-            <Button onClick={requestLogout}>Sair</Button>
-            <IconButton onClick={handleShow}>
-              {show ? <Close /> : <Add color='primary' />}
-            </IconButton>
-
+            <div class="app-bar">
+              <Button
+                variant="contained"
+                color='primary'
+                onClick={handleShow}
+                startIcon={show ? <Close /> : <Add />}
+              >
+                {show ? 'Fechar' : 'Novo Cadastro'}
+              </Button>
+              <Button onClick={requestLogout}>Sair</Button>
+            </div>
             {show &&
               <>
                 <Formulario />
@@ -58,7 +68,7 @@ const Pessoas = () => {
           </>
         : <Login onClick={requestLogin} />
       }
-    </Paper>
+    </div>
   )
 } 
 
