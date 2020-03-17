@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "campanha-4c788",
     "public": "build",
     "ignore": [
       "firebase.json",

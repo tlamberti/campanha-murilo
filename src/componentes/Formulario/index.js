@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
+
+import { Context } from '../../context';
 
 import { TextField, Button } from '@material-ui/core';
 
 import './style.css';
 
-export default function Formulario({ nome, celular, escritoPor, local, manipulaInput, cadastrarPessoa }) {
+export default function Formulario() {
+  const { 
+    nome,
+    celular,
+    escritoPor,
+    local,
+    manipulaInput,
+    cadastrarPessoa
+  } = useContext(Context);
+
   return (
     <form className="container" onSubmit={cadastrarPessoa}>
       <TextField 

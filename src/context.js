@@ -1,54 +1,138 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useCallback } from 'react';
 import axios from 'axios'; 
 
 export const Context = createContext();
 
 const ContextProvider = props => {
+  const [ isLoading, setIsLoading ] = useState(false);
+  const [ error, setError ] = useState("");
+  
+  const [ username, setUsername ] = useState("");
+  const [ password, setPassword ] = useState("");
+  
   const [ lista, setLista ] = useState();
 
-  // async function submeterLogin(cpf, dtnascimento, history, rota) {
-  //   // cpf: "399.567.608-11",
-  //   // dtnascimento: "1990-09-29"
+  // Cadastro de novas pessoas
+  const [user, setUser] = useState(false);
+  const [nome, setNome] = useState('');
+  const [celular, setCelular] = useState('');
+  const [escritoPor, setEscritoPor] = useState('');
+  const [local, setLocal] = useState('');
+  
+  const firebaseAuth = props.firebaseLogin;
 
-  //   try {    
-  //     let corpo = {
-  //       cpf,
-  //       dtnascimento
-  //     };
-  //     const response = await post(`/auth/login`, corpo);
-  //     login(response.token);
-  //     irParaNovaRota(history, rota);
+  function onAuthStateChange(callback) {
+    return firebaseAuth.onAuthStateChanged(user => {
+      if (user) {
+        callback({ loggedIn: true, email: user.email });
+      } else {
+        callback({ loggedIn: false });
+      }
+    });
+  }
 
-  //     // TODO: atualizar estado com objeto do usuario logado {id, nome, avatar, etc}.
-  //   } catch (error) {
-  //     console.error(error)
-  //     setError(error.message);
-  //   }
-  // }
+  function login(username, password) {
+    return new Promise((resolve, reject) => {
+      firebaseAuth
+        .signInWithEmailAndPassword(username, password)
+        .then(() => resolve())
+        .catch(error => reject(error));
+    });
+  }
+
+  function logout() {
+    firebaseAuth.signOut();
+  }
+
+  const requestLogin = useCallback((username, password) => {
+    login(username, password).catch(error => setError(error.code));
+  }, []);
+
+  const requestLogout = useCallback(() => {
+    logout();
+  }, []);
 
   async function fetchLista() {
-    const api = axios.create({
-      baseURL: 'http://localhost:3333/',
-    });
-
     try {
-      const response = await api({
-        method: 'get',
-      });
-      setLista(response.data)
+      setIsLoading(true);
+      const response = await axios.get('http://localhost:3333/');
+      setLista(response.data);
     }
     catch(err) {
       console.error('erro:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function cadastrarPessoa(e) {
+    e.preventDefault();
+
+    try {      
+      axios.post('http://localhost:3333/cadastro', {
+        nome: nome,
+        celular: celular,
+        escritopor: escritoPor,
+        local: local
+      })
+      .then(function (response) {
+        fetchLista();
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  function manipulaInput(e, input) {
+    switch (input) {
+      case 'nome':
+        setNome(e)
+        break;
+      case 'celular':
+        setCelular(e)
+        break;
+      case 'escritoPor':
+        setEscritoPor(e)
+        break;
+      case 'local':
+        setLocal(e)
+        break;
+    
+      default:
+        console.log('e :', e)
+        break;
     }
   }
     
   return (
     <Context.Provider
-      value={{
-        lista,
-        setLista,
-        fetchLista
-      }}
+    value={{
+      error,
+      isLoading,
+      username,
+      password,
+      lista,
+      user,
+      nome,
+      celular,
+      escritoPor,
+      local,
+
+      setError,
+      setUsername,
+      setPassword,
+      onAuthStateChange,
+      requestLogin,
+      requestLogout,
+      setLista,
+      fetchLista,
+      cadastrarPessoa,
+      manipulaInput,
+      setUser
+    }}
     >
       {props.children}
     </Context.Provider>
