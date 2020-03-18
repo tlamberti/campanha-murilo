@@ -7,22 +7,25 @@ import { Add, Close } from '@material-ui/icons';
 import Login from '../../componentes/Login';
 import Tabela from '../../componentes/Tabela';
 import Formulario from '../../componentes/Formulario';
+import Mensagem from '../../componentes/Mensagem';
 
 import './style.css';
 
 const Pessoas = () => {
   const { 
-    fetchLista, 
     lista, 
     isLoading, 
     onAuthStateChange,
     requestLogin,
     requestLogout,
+    removePessoa,
     user,
-    setUser
+    setUser,
+    exibeFormulario,
+    handleExibeFormulario,
+    setSucesso,
+    sucesso
   } = useContext(Context);
-
-  const [show, setShow] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChange(setUser);
@@ -31,40 +34,28 @@ const Pessoas = () => {
     }
   }, []);
 
-  useEffect(() => {
-    console.log(user);
-    if(user.loggedIn)
-      fetchLista();
-  }, [user.loggedIn])
-
-
-  function handleShow() {
-    setShow(!show);
-  }
-
   return (
     <div>
-      {isLoading && <CircularProgress />}
       {
         user.loggedIn ?
           <>
-            <div class="app-bar">
-              <Button
-                variant="contained"
+            <div className="app-bar">
+              <IconButton
                 color='primary'
-                onClick={handleShow}
-                startIcon={show ? <Close /> : <Add />}
-              >
-                {show ? 'Fechar' : 'Novo Cadastro'}
-              </Button>
+                onClick={handleExibeFormulario}>
+                {exibeFormulario ? <Close /> : <Add />}
+              </IconButton>
               <Button onClick={requestLogout}>Sair</Button>
             </div>
-            {show &&
-              <>
-                <Formulario />
-              </>
-            }
-            <Tabela pessoas={lista} isLoading={isLoading}/>
+            {exibeFormulario && <Formulario />}
+            <Mensagem 
+              texto={sucesso}
+              tipo="success"
+              exibicao={sucesso}
+              onChange={setSucesso}
+            />
+            {isLoading && <CircularProgress />}
+            <Tabela pessoas={lista} removePessoa={removePessoa} isLoading={isLoading}/>
           </>
         : <Login onClick={requestLogin} />
       }

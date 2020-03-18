@@ -1,14 +1,16 @@
-import React, { createContext, useState, useCallback } from 'react';
-import axios from 'axios'; 
+import React, { createContext, useState, useCallback, useEffect } from 'react';
+
+import { mascaraTelefone } from './util/ferramentas';
 
 export const Context = createContext();
 
 const ContextProvider = props => {
   const [ isLoading, setIsLoading ] = useState(false);
-  const [ error, setError ] = useState("");
+  const [ error, setError ] = useState('');
+  const [ sucesso, setSucesso ] = useState('');
   
-  const [ username, setUsername ] = useState("");
-  const [ password, setPassword ] = useState("");
+  const [ username, setUsername ] = useState('');
+  const [ password, setPassword ] = useState('');
   
   const [ lista, setLista ] = useState();
 
@@ -18,8 +20,11 @@ const ContextProvider = props => {
   const [celular, setCelular] = useState('');
   const [escritoPor, setEscritoPor] = useState('');
   const [local, setLocal] = useState('');
+  const [exibeFormulario, setExibeFormulario] = useState(false);
+
   
   const firebaseAuth = props.firebaseLogin;
+  const firebaseDatabase = props.firebaseDatabase;
 
   function onAuthStateChange(callback) {
     return firebaseAuth.onAuthStateChanged(user => {
@@ -52,38 +57,72 @@ const ContextProvider = props => {
     logout();
   }, []);
 
+
   async function fetchLista() {
     try {
       setIsLoading(true);
-      const response = await axios.get('http://localhost:3333/');
-      setLista(response.data);
+      firebaseDatabase.collection('pessoas').onSnapshot(snapshot => {
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        
+        setLista(data);
+        setNome('');
+      });
+      setIsLoading(false);
     }
     catch(err) {
       console.error('erro:', err);
-    } finally {
-      setIsLoading(false);
     }
   }
 
-  async function cadastrarPessoa(e) {
-    e.preventDefault();
+  useEffect(() => {
+    if(user.loggedIn) {
+      const unsubscribe = firebaseDatabase.collection('pessoas').onSnapshot(snapshot => {
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
 
-    try {      
-      axios.post('http://localhost:3333/cadastro', {
+        setLista(data);
+      });
+
+      return () => unsubscribe();
+    }
+  }, [user.loggedIn])
+
+  function cadastrarPessoa(e) {
+    e.preventDefault();
+ 
+    try {  
+      firebaseDatabase.collection('pessoas').add({
         nome: nome,
         celular: celular,
         escritopor: escritoPor,
         local: local
-      })
-      .then(function (response) {
-        fetchLista();
-      })
-      .catch(function (error) {
-        console.log(error);
       });
+
+      setNome('');
+      setCelular('');
+      setEscritoPor('');
+      setLocal('');
+      // setExibeFormulario(false);
+      // setSucesso('Cadastrado com Sucesso!')
     } catch (error) {
       console.error(error)
     }
+  }
+
+  function removePessoa(id) {
+    firebaseDatabase.collection('pessoas').doc(id).delete()
+      .then(() => {
+        setSucesso('Removido com Sucesso!')
+      });
+  }
+
+  function handleExibeFormulario() {
+    setExibeFormulario(!exibeFormulario);
   }
 
   function manipulaInput(e, input) {
@@ -92,7 +131,7 @@ const ContextProvider = props => {
         setNome(e)
         break;
       case 'celular':
-        setCelular(e)
+        setCelular(mascaraTelefone(e))
         break;
       case 'escritoPor':
         setEscritoPor(e)
@@ -112,6 +151,8 @@ const ContextProvider = props => {
     value={{
       error,
       isLoading,
+      sucesso,
+      exibeFormulario,
       username,
       password,
       lista,
@@ -122,6 +163,7 @@ const ContextProvider = props => {
       local,
 
       setError,
+      setSucesso,
       setUsername,
       setPassword,
       onAuthStateChange,
@@ -130,8 +172,10 @@ const ContextProvider = props => {
       setLista,
       fetchLista,
       cadastrarPessoa,
+      removePessoa,
       manipulaInput,
-      setUser
+      setUser,
+      handleExibeFormulario
     }}
     >
       {props.children}
