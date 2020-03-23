@@ -55,7 +55,7 @@ const Pessoas = () => {
               onChange={setSucesso}
             />
             {isLoading && <CircularProgress />}
-            <Tabela pessoas={lista} removePessoa={removePessoa} isLoading={isLoading}/>
+            <Tabela user={user} pessoas={lista} removePessoa={removePessoa} isLoading={isLoading}/>
           </>
         : <Login onClick={requestLogin} />
       }

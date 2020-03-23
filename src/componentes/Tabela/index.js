@@ -22,11 +22,13 @@ const columns = [
   { id: 'local', label: 'Local', minWidth: 170 },
 ];
 
-export default function Tabela({ pessoas, removePessoa, isLoading }) {
+export default function Tabela({ pessoas, removePessoa, isLoading, user }) {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   
+  console.log('user: ', user)
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -38,7 +40,7 @@ export default function Tabela({ pessoas, removePessoa, isLoading }) {
 
   return (
     <>
-      {pessoas && 
+      {user.email === 'adm@campanhamurilo.com' && pessoas && 
         <div className="tabela">
           <TableContainer>
             {isLoading && <CircularProgress />}
