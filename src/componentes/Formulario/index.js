@@ -10,10 +10,10 @@ export default function Formulario() {
   const { 
     nome,
     celular,
-    escritoPor,
     local,
     manipulaInput,
-    cadastrarPessoa
+    cadastrarPessoa,
+    user
   } = useContext(Context);
 
   
@@ -23,21 +23,25 @@ export default function Formulario() {
         value={nome}
         label="Nome" 
         onChange={e => manipulaInput(e.target.value, 'nome')}
+        required
       />
       <TextField 
         value={celular}
         label="Celular" 
         onChange={e => manipulaInput(e.target.value, 'celular')}
+        required
       />
       <TextField 
-        value={escritoPor}
+        value={user.email}
         label="Escrito por" 
         onChange={e => manipulaInput(e.target.value, 'escritoPor')}
+        disabled
       />
       <TextField 
         value={local}
         label="Local" 
         onChange={e => manipulaInput(e.target.value, 'local')}
+        required
       />
 
       <Button 

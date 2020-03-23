@@ -27,8 +27,6 @@ export default function Tabela({ pessoas, removePessoa, isLoading, user }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   
-  console.log('user: ', user)
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };

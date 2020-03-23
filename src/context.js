@@ -5,6 +5,7 @@ import { mascaraTelefone } from './util/ferramentas';
 export const Context = createContext();
 
 const ContextProvider = props => {
+  const [ open, setOpen ] = useState(false);
   const [ isLoading, setIsLoading ] = useState(false);
   const [ error, setError ] = useState('');
   const [ sucesso, setSucesso ] = useState('');
@@ -99,25 +100,23 @@ const ContextProvider = props => {
       firebaseDatabase.collection('pessoas').add({
         nome: nome,
         celular: celular,
-        escritopor: escritoPor,
+        escritopor: user.email,
         local: local
       });
 
       setNome('');
       setCelular('');
-      setEscritoPor('');
       setLocal('');
-      // setExibeFormulario(false);
-      // setSucesso('Cadastrado com Sucesso!')
+      setSucesso('Cadastrado com Sucesso!');
     } catch (error) {
       console.error(error)
     }
   }
 
-  function removePessoa(id) {
+  function removePessoa(id, dialog) {
     firebaseDatabase.collection('pessoas').doc(id).delete()
       .then(() => {
-        setSucesso('Removido com Sucesso!')
+        setSucesso('Removido com Sucesso!');
       });
   }
 
@@ -150,6 +149,7 @@ const ContextProvider = props => {
     <Context.Provider
     value={{
       error,
+      open,
       isLoading,
       sucesso,
       exibeFormulario,
@@ -163,6 +163,7 @@ const ContextProvider = props => {
       local,
 
       setError,
+      setOpen,
       setSucesso,
       setUsername,
       setPassword,
