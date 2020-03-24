@@ -39,7 +39,7 @@ export default function Formulario() {
       />
       <TextField 
         value={local}
-        label="Local" 
+        label="Vínculo (trabalho, vizinho(a), etc.)" 
         onChange={e => manipulaInput(e.target.value, 'local')}
         required
       />
