@@ -58,35 +58,11 @@ const ContextProvider = props => {
     logout();
   }, []);
 
-
-  async function fetchLista() {
-    try {
-      setIsLoading(true);
-      firebaseDatabase.collection('pessoas').onSnapshot(snapshot => {
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }))
-        
-        setLista(data);
-        setNome('');
-      });
-      setIsLoading(false);
-    }
-    catch(err) {
-      console.error('erro:', err);
-    }
-  }
-
   useEffect(() => {
     if(user.loggedIn) {
-      const unsubscribe = firebaseDatabase.collection('pessoas').onSnapshot(snapshot => {
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }))
-
-        setLista(data);
+      const unsubscribe = firebaseDatabase.ref('pessoas').on('value', function(snapshot){
+        const obj = Object.values(snapshot.val())
+        setLista(obj);
       });
 
       return () => unsubscribe();
@@ -97,12 +73,13 @@ const ContextProvider = props => {
     e.preventDefault();
  
     try {  
-      firebaseDatabase.collection('pessoas').add({
+      var data = {
         nome: nome,
         celular: celular,
         escritopor: user.email,
         local: local
-      });
+      };
+      firebaseDatabase.ref().child('pessoas').push(data);
 
       setNome('');
       setCelular('');
@@ -171,7 +148,6 @@ const ContextProvider = props => {
       requestLogin,
       requestLogout,
       setLista,
-      fetchLista,
       cadastrarPessoa,
       removePessoa,
       manipulaInput,

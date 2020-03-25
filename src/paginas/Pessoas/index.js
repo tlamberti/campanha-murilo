@@ -31,6 +31,7 @@ const Pessoas = () => {
   } = useContext(Context);
 
   useEffect(() => {
+    console.log(`Lista: ${lista}`)
     const unsubscribe = onAuthStateChange(setUser);
     return () => {
       unsubscribe(setUser);
