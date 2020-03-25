@@ -20,7 +20,7 @@ const ContextProvider = props => {
   const [nome, setNome] = useState('');
   const [celular, setCelular] = useState('');
   const [escritoPor, setEscritoPor] = useState('');
-  const [local, setLocal] = useState('');
+  const [vinculo, setVinculo] = useState('');
   const [exibeFormulario, setExibeFormulario] = useState(false);
 
   
@@ -60,9 +60,20 @@ const ContextProvider = props => {
 
   useEffect(() => {
     if(user.loggedIn) {
-      const unsubscribe = firebaseDatabase.ref('pessoas').on('value', function(snapshot){
-        const obj = Object.values(snapshot.val())
-        setLista(obj);
+      const unsubscribe = firebaseDatabase.ref('pessoas').on('value', snapshot => {
+        let pessoas = snapshot.val();
+        if(!pessoas) {
+          return;
+        }
+        
+        const arrPessoasComId = Object.entries(pessoas).map(f => {
+          console.log(f[1], f[0])
+          let objPessoa = f[1];
+          objPessoa.id = f[0]
+          return objPessoa
+        })
+
+        setLista(arrPessoasComId || []);
       });
 
       return () => unsubscribe();
@@ -77,21 +88,27 @@ const ContextProvider = props => {
         nome: nome,
         celular: celular,
         escritopor: user.email,
-        local: local
+        vinculo: vinculo
       };
       firebaseDatabase.ref().child('pessoas').push(data);
 
       setNome('');
       setCelular('');
-      setLocal('');
+      setVinculo('');
       setSucesso('Cadastrado com Sucesso!');
     } catch (error) {
       console.error(error)
     }
   }
 
-  function removePessoa(id, dialog) {
-    firebaseDatabase.collection('pessoas').doc(id).delete()
+  function removePessoa(id) {
+    var updates = {};
+    updates['/pessoas/' + id] = null;
+
+    console.log('updates', updates)
+    firebaseDatabase
+      .ref()
+      .update(updates)
       .then(() => {
         setSucesso('Removido com Sucesso!');
       });
@@ -112,8 +129,8 @@ const ContextProvider = props => {
       case 'escritoPor':
         setEscritoPor(e)
         break;
-      case 'local':
-        setLocal(e)
+      case 'vinculo':
+        setVinculo(e)
         break;
     
       default:
@@ -137,7 +154,7 @@ const ContextProvider = props => {
       nome,
       celular,
       escritoPor,
-      local,
+      vinculo,
 
       setError,
       setOpen,
