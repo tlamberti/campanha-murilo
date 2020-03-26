@@ -22,7 +22,7 @@ const columns = [
   { id: 'vinculo', label: 'Vínculo', minWidth: 170 },
 ];
 
-export default function Tabela({ pessoas, handleDialog, isLoading, user }) {
+export default function Tabela({ pessoas, handleDialog, isLoading }) {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -38,7 +38,7 @@ export default function Tabela({ pessoas, handleDialog, isLoading, user }) {
 
   return (
     <>
-      {user.email === 'adm@campanhamurilo.com' && pessoas && 
+      {pessoas && 
         <div className="tabela">
           <TableContainer>
             {isLoading && <CircularProgress />}
