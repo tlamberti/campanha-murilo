@@ -62,14 +62,13 @@ const ContextProvider = props => {
   useEffect(() => {
     if(user.loggedIn) {
       const unsubscribe = firebaseDatabase.ref('pessoas').on('value', snapshot => {
-        let pessoas = snapshot.val();
+        let pessoas = snapshot && snapshot.val();
         if(!pessoas) {
           setLista([]);
           return;
         }
 
         const arrPessoasComId = Object.entries(pessoas).map(f => {
-          console.log(f[1], f[0])
           let objPessoa = f[1];
           objPessoa.id = f[0]
           return objPessoa
