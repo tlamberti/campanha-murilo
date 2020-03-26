@@ -17,6 +17,7 @@ const ContextProvider = props => {
 
   // Cadastro de novas pessoas
   const [user, setUser] = useState(false);
+  const [ idAtual, setIdAtual ] = useState();
   const [nome, setNome] = useState('');
   const [celular, setCelular] = useState('');
   const [escritoPor, setEscritoPor] = useState('');
@@ -63,9 +64,10 @@ const ContextProvider = props => {
       const unsubscribe = firebaseDatabase.ref('pessoas').on('value', snapshot => {
         let pessoas = snapshot.val();
         if(!pessoas) {
+          setLista([]);
           return;
         }
-        
+
         const arrPessoasComId = Object.entries(pessoas).map(f => {
           console.log(f[1], f[0])
           let objPessoa = f[1];
@@ -101,11 +103,11 @@ const ContextProvider = props => {
     }
   }
 
-  function removePessoa(id) {
+  function removePessoa() {
     var updates = {};
-    updates['/pessoas/' + id] = null;
+    updates['/pessoas/' + idAtual] = null;
 
-    console.log('updates', updates)
+    setOpen(false);
     firebaseDatabase
       .ref()
       .update(updates)
@@ -139,6 +141,11 @@ const ContextProvider = props => {
     }
   }
     
+  const handleDialog = (condition, id) => {
+    setOpen(condition);
+    setIdAtual(id);
+  };
+
   return (
     <Context.Provider
     value={{
@@ -169,7 +176,8 @@ const ContextProvider = props => {
       removePessoa,
       manipulaInput,
       setUser,
-      handleExibeFormulario
+      handleExibeFormulario,
+      handleDialog
     }}
     >
       {props.children}

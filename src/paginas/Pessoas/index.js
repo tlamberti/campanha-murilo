@@ -27,7 +27,7 @@ const Pessoas = () => {
     setSucesso,
     sucesso,
     open,
-    setOpen
+    handleDialog
   } = useContext(Context);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const Pessoas = () => {
               <Button onClick={requestLogout}>Sair</Button>
             </div>
             {exibeFormulario && <Formulario />}
-            {open && <Alerta setOpen={setOpen} open={open} removePessoa={removePessoa} />}
+            {open && <Alerta open={open} handleDialog={handleDialog} removePessoa={removePessoa} />}
             <Mensagem 
               texto={sucesso}
               tipo="success"
@@ -59,7 +59,7 @@ const Pessoas = () => {
               onChange={setSucesso}
             />
             {isLoading && <CircularProgress />}
-            <Tabela user={user} pessoas={lista} removePessoa={removePessoa} isLoading={isLoading}/>
+            <Tabela user={user} pessoas={lista} handleDialog={handleDialog} isLoading={isLoading}/>
           </>
         : <Login onClick={requestLogin} />
       }
