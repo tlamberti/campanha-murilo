@@ -17,10 +17,11 @@ const ContextProvider = props => {
 
   // Cadastro de novas pessoas
   const [user, setUser] = useState(false);
+  const [ idAtual, setIdAtual ] = useState();
   const [nome, setNome] = useState('');
   const [celular, setCelular] = useState('');
   const [escritoPor, setEscritoPor] = useState('');
-  const [local, setLocal] = useState('');
+  const [vinculo, setVinculo] = useState('');
   const [exibeFormulario, setExibeFormulario] = useState(false);
 
   
@@ -58,35 +59,23 @@ const ContextProvider = props => {
     logout();
   }, []);
 
-
-  async function fetchLista() {
-    try {
-      setIsLoading(true);
-      firebaseDatabase.collection('pessoas').onSnapshot(snapshot => {
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }))
-        
-        setLista(data);
-        setNome('');
-      });
-      setIsLoading(false);
-    }
-    catch(err) {
-      console.error('erro:', err);
-    }
-  }
-
   useEffect(() => {
     if(user.loggedIn) {
-      const unsubscribe = firebaseDatabase.collection('pessoas').onSnapshot(snapshot => {
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }))
+      const unsubscribe = firebaseDatabase.ref('pessoas').on('value', snapshot => {
+        let pessoas = snapshot.val();
+        if(!pessoas) {
+          setLista([]);
+          return;
+        }
 
-        setLista(data);
+        const arrPessoasComId = Object.entries(pessoas).map(f => {
+          console.log(f[1], f[0])
+          let objPessoa = f[1];
+          objPessoa.id = f[0]
+          return objPessoa
+        })
+
+        setLista(arrPessoasComId || []);
       });
 
       return () => unsubscribe();
@@ -97,24 +86,31 @@ const ContextProvider = props => {
     e.preventDefault();
  
     try {  
-      firebaseDatabase.collection('pessoas').add({
+      var data = {
         nome: nome,
         celular: celular,
         escritopor: user.email,
-        local: local
-      });
+        vinculo: vinculo
+      };
+      firebaseDatabase.ref().child('pessoas').push(data);
 
       setNome('');
       setCelular('');
-      setLocal('');
+      setVinculo('');
       setSucesso('Cadastrado com Sucesso!');
     } catch (error) {
       console.error(error)
     }
   }
 
-  function removePessoa(id, dialog) {
-    firebaseDatabase.collection('pessoas').doc(id).delete()
+  function removePessoa() {
+    var updates = {};
+    updates['/pessoas/' + idAtual] = null;
+
+    setOpen(false);
+    firebaseDatabase
+      .ref()
+      .update(updates)
       .then(() => {
         setSucesso('Removido com Sucesso!');
       });
@@ -135,8 +131,8 @@ const ContextProvider = props => {
       case 'escritoPor':
         setEscritoPor(e)
         break;
-      case 'local':
-        setLocal(e)
+      case 'vinculo':
+        setVinculo(e)
         break;
     
       default:
@@ -145,6 +141,11 @@ const ContextProvider = props => {
     }
   }
     
+  const handleDialog = (condition, id) => {
+    setOpen(condition);
+    setIdAtual(id);
+  };
+
   return (
     <Context.Provider
     value={{
@@ -160,7 +161,7 @@ const ContextProvider = props => {
       nome,
       celular,
       escritoPor,
-      local,
+      vinculo,
 
       setError,
       setOpen,
@@ -171,12 +172,12 @@ const ContextProvider = props => {
       requestLogin,
       requestLogout,
       setLista,
-      fetchLista,
       cadastrarPessoa,
       removePessoa,
       manipulaInput,
       setUser,
-      handleExibeFormulario
+      handleExibeFormulario,
+      handleDialog
     }}
     >
       {props.children}

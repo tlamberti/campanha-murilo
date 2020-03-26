@@ -6,35 +6,24 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-const Alerta = ({ open, setOpen, removePessoa }) => {
-
-  const excluiPessoa = () => {
-    setOpen(false);
-    removePessoa();
-  }
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+const Alerta = ({ open, handleDialog, removePessoa }) => {
 
   return (
     <Dialog
       open={open}
-      onClose={handleClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
+      onClose={handleDialog}
     >
-      <DialogTitle id="alert-dialog-title">{"Use Google's location service?"}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">Exclusão</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           Deseja realmente excluir essa pessoa?
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => removePessoa(' ', 'sim')} color="primary">
+        <Button onClick={() => removePessoa()} color="primary">
           Sim
         </Button>
-        <Button onClick={(handleClose)} color="primary" autoFocus>
+        <Button onClick={() => handleDialog(false)} color="primary" autoFocus>
           Não
         </Button>
       </DialogActions>

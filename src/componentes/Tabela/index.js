@@ -19,10 +19,10 @@ const columns = [
   { id: 'nome', label: 'Nome', minWidth: 170 },
   { id: 'celular', label: 'Celular', minWidth: 150 },
   { id: 'escritopor', label: 'Escrito por', minWidth: 170 },
-  { id: 'local', label: 'Vínculo', minWidth: 170 },
+  { id: 'vinculo', label: 'Vínculo', minWidth: 170 },
 ];
 
-export default function Tabela({ pessoas, removePessoa, isLoading, user }) {
+export default function Tabela({ pessoas, handleDialog, isLoading, user }) {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -74,7 +74,7 @@ export default function Tabela({ pessoas, removePessoa, isLoading, user }) {
                         );
                       })}
                       <TableCell>
-                        <IconButton onClick={() => removePessoa(pessoa.id)}>
+                        <IconButton onClick={() => handleDialog(true, pessoa.id)}>
                           <DeleteIcon />
                         </IconButton>
                       </TableCell>

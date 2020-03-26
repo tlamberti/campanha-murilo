@@ -10,7 +10,7 @@ export default function Formulario() {
   const { 
     nome,
     celular,
-    local,
+    vinculo,
     manipulaInput,
     cadastrarPessoa,
     user
@@ -38,9 +38,9 @@ export default function Formulario() {
         disabled
       />
       <TextField 
-        value={local}
+        value={vinculo}
         label="Vínculo (trabalho, vizinho(a), etc.)" 
-        onChange={e => manipulaInput(e.target.value, 'local')}
+        onChange={e => manipulaInput(e.target.value, 'vinculo')}
         required
       />
 
