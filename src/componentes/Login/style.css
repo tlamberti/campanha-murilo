@@ -26,16 +26,3 @@
 .form div {
   margin-bottom: 16px;
 }
-
-.form div label,
-.form div label.Mui-focused {
-  color: #2e2e30;
-}
-        
-.form div .MuiInput-underline:after {
-  border-bottom-color: #2e2e30;
-}
-
-.form button {
-  background-color: #EEC271;
-}
