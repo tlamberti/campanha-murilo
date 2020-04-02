@@ -1,8 +1,10 @@
 import React, { createContext, useState, useCallback, useEffect } from 'react';
-
 import { mascaraTelefone } from './util/ferramentas';
 
 export const Context = createContext();
+let develop = true;
+let collection = develop ? 'develop-pessoas' : 'pessoas';
+
 
 const ContextProvider = props => {
   const [ open, setOpen ] = useState(false);
@@ -16,13 +18,14 @@ const ContextProvider = props => {
   const [ lista, setLista ] = useState();
 
   // Cadastro de novas pessoas
-  const [user, setUser] = useState(false);
+  const [ user, setUser ] = useState(false);
+  const [ idPessoa, setIdPessoa ] = useState(null);
   const [ idAtual, setIdAtual ] = useState();
-  const [nome, setNome] = useState('');
-  const [celular, setCelular] = useState('');
-  const [escritoPor, setEscritoPor] = useState('');
-  const [vinculo, setVinculo] = useState('');
-  const [exibeFormulario, setExibeFormulario] = useState(false);
+  const [ nome, setNome ] = useState('');
+  const [ celular, setCelular ] = useState('');
+  const [ escritoPor, setEscritoPor ] = useState('');
+  const [ vinculo, setVinculo ] = useState('');
+  const [ exibeFormulario, setExibeFormulario ] = useState(false);
 
   
   const firebaseAuth = props.firebaseLogin;
@@ -31,7 +34,7 @@ const ContextProvider = props => {
   function onAuthStateChange(callback) {
     return firebaseAuth.onAuthStateChanged(user => {
       if (user) {
-        callback({ loggedIn: true, email: user.email });
+        callback({ loggedIn: true, email: user.email, uid: user.uid });
       } else {
         callback({ loggedIn: false });
       }
@@ -61,7 +64,8 @@ const ContextProvider = props => {
 
   useEffect(() => {
     if(user.loggedIn) {
-      const unsubscribe = firebaseDatabase.ref('pessoas').on('value', snapshot => {
+      
+      const unsubscribe = firebaseDatabase.ref(collection).on('value', snapshot => {
         let pessoas = snapshot && snapshot.val();
         if(!pessoas) {
           setLista([]);
@@ -89,30 +93,61 @@ const ContextProvider = props => {
         nome: nome,
         celular: celular,
         escritopor: user.email,
-        vinculo: vinculo
+        vinculo: vinculo,
+        idusuario: user.uid
       };
-      firebaseDatabase.ref().child('pessoas').push(data);
 
+      if(idPessoa) {
+        firebaseDatabase.ref(`${collection}/${idPessoa}`)
+        .update(data);
+        setExibeFormulario(false);
+      } else {
+        firebaseDatabase.ref().child(collection)
+        .push(data);
+      }
+
+    } catch (error) {
+      console.error(error)
+    } finally {
+      
+      setSucesso(idPessoa ? 'Alterado com Sucesso!' : 'Cadastrado com Sucesso!');
       setNome('');
       setCelular('');
       setVinculo('');
-      setSucesso('Cadastrado com Sucesso!');
-    } catch (error) {
-      console.error(error)
+      setIdPessoa(null);
     }
   }
 
   function removePessoa() {
     var updates = {};
-    updates['/pessoas/' + idAtual] = null;
+    updates[`/${collection}/` + idAtual] = null;
 
     setOpen(false);
     firebaseDatabase
       .ref()
       .update(updates)
+      .then(() => window.scrollTo(0,0))
       .then(() => {
         setSucesso('Removido com Sucesso!');
-      });
+      }
+    );
+  }
+
+  function editaPessoa(pessoa) {
+    setExibeFormulario(true);
+    window.scrollTo(0,0);
+    setIdPessoa(pessoa.id);
+    setNome(pessoa.nome);
+    setCelular(pessoa.celular);
+    setVinculo(pessoa.vinculo);
+  }
+
+  function cancelEdit() {
+    setExibeFormulario(false);
+    setIdPessoa('');
+    setNome('');
+    setCelular('');
+    setVinculo('');
   }
 
   function handleExibeFormulario() {
@@ -153,6 +188,7 @@ const ContextProvider = props => {
       isLoading,
       sucesso,
       exibeFormulario,
+      idPessoa,
       username,
       password,
       lista,
@@ -172,6 +208,8 @@ const ContextProvider = props => {
       requestLogout,
       setLista,
       cadastrarPessoa,
+      editaPessoa,
+      cancelEdit,
       removePessoa,
       manipulaInput,
       setUser,

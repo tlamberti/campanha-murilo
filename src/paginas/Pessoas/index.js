@@ -20,6 +20,9 @@ const Pessoas = () => {
     requestLogin,
     requestLogout,
     removePessoa,
+    idPessoa,
+    editaPessoa,
+    cancelEdit,
     user,
     setUser,
     exibeFormulario,
@@ -50,7 +53,7 @@ const Pessoas = () => {
               </IconButton>
               <Button onClick={requestLogout}>Sair</Button>
             </div>
-            {exibeFormulario && <Formulario />}
+            {exibeFormulario && <Formulario cancelEdit={cancelEdit} idPessoa={idPessoa} />}
             {open && <Alerta open={open} handleDialog={handleDialog} removePessoa={removePessoa} />}
             <Mensagem 
               texto={sucesso}
@@ -59,7 +62,13 @@ const Pessoas = () => {
               onChange={setSucesso}
             />
             {isLoading && <CircularProgress />}
-            <Tabela user={user} pessoas={lista} handleDialog={handleDialog} isLoading={isLoading}/>
+            <Tabela 
+              user={user} 
+              pessoas={lista} 
+              handleDialog={handleDialog} 
+              isLoading={isLoading}
+              editaPessoa={editaPessoa}
+            />
           </>
         : <Login onClick={requestLogin} />
       }

@@ -13,7 +13,9 @@ export default function Formulario() {
     vinculo,
     manipulaInput,
     cadastrarPessoa,
-    user
+    user,
+    cancelEdit,
+    idPessoa
   } = useContext(Context);
 
   
@@ -49,6 +51,7 @@ export default function Formulario() {
         variant="contained" 
         color="primary">Enviar
       </Button>
+      {idPessoa && <Button variant="contained" color="secondary" onClick={() => cancelEdit()}>Cancelar</Button>}
   </form>
   )
 }

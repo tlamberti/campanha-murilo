@@ -12,6 +12,7 @@ import {
   IconButton
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 
 import './style.css';
 
@@ -22,7 +23,7 @@ const columns = [
   { id: 'vinculo', label: 'Vínculo', minWidth: 170 },
 ];
 
-export default function Tabela({ pessoas, handleDialog, isLoading }) {
+export default function Tabela({ pessoas, handleDialog, isLoading, editaPessoa }) {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -74,6 +75,9 @@ export default function Tabela({ pessoas, handleDialog, isLoading }) {
                         );
                       })}
                       <TableCell>
+                        <IconButton onClick={() => editaPessoa(pessoa)}>
+                          <EditIcon />
+                        </IconButton>
                         <IconButton onClick={() => handleDialog(true, pessoa.id)}>
                           <DeleteIcon />
                         </IconButton>
