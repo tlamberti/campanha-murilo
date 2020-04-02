@@ -23,7 +23,7 @@ const columns = [
   { id: 'vinculo', label: 'Vínculo', minWidth: 170 },
 ];
 
-export default function Tabela({ pessoas, handleDialog, isLoading, editaPessoa }) {
+export default function Tabela({ pessoas, handleDialog, isLoading, editaPessoa, user }) {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -62,28 +62,30 @@ export default function Tabela({ pessoas, handleDialog, isLoading, editaPessoa }
               </TableHead>
               <TableBody>
                 {pessoas && pessoas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((pessoa, index) => {
-                  return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                      {columns.map(column => {
-                        const value = pessoa[column.id];
-                        return (
-                          <>
-                            <TableCell key={column.id} align={column.align}>
-                              {column.format && typeof value === 'number' ? column.format(value) : value}
-                            </TableCell>
-                          </>
-                        );
-                      })}
-                      <TableCell>
-                        <IconButton onClick={() => editaPessoa(pessoa)}>
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton onClick={() => handleDialog(true, pessoa.id)}>
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  );
+                  if(user.email == 'adm@campanhamurilo.com' || pessoa.idusuario == user.uid) {
+                    return (
+                      <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                        {columns.map(column => {
+                          const value = pessoa[column.id];
+                          return (
+                            <>
+                              <TableCell key={column.id} align={column.align}>
+                                {column.format && typeof value === 'number' ? column.format(value) : value}
+                              </TableCell>
+                            </>
+                          );
+                        })}
+                        <TableCell>
+                          <IconButton onClick={() => editaPessoa(pessoa)}>
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton onClick={() => handleDialog(true, pessoa.id)}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
                 })}
               </TableBody>
             </Table>
