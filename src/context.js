@@ -2,7 +2,7 @@ import React, { createContext, useState, useCallback, useEffect } from 'react';
 import { mascaraTelefone } from './util/ferramentas';
 
 export const Context = createContext();
-let develop = true;
+let develop = false;
 let collection = develop ? 'develop-pessoas' : 'pessoas';
 
 
