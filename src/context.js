@@ -77,6 +77,15 @@ const ContextProvider = props => {
           objPessoa.id = f[0]
           return objPessoa
         })
+        
+        //Filtra exibição
+        if(user.email !== 'adm@campanhamurilo.com') {
+            let filtroPessoas =  arrPessoasComId.filter(pessoa => {
+              if(pessoa.idusuario === user.uid)
+                return pessoa;
+            })
+            return setLista(filtroPessoas);
+          }
 
         setLista(arrPessoasComId || []);
       });
