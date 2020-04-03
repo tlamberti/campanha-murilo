@@ -23,7 +23,7 @@ const columns = [
   { id: 'vinculo', label: 'Vínculo', minWidth: 170 },
 ];
 
-export default function Tabela({ pessoas, handleDialog, isLoading, editaPessoa, user }) {
+export default function Tabela({ pessoas, handleDialog, isLoading, editaPessoa }) {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);

@@ -5,12 +5,12 @@
 
   visibility: hidden;
   opacity: 0;
-  transition: visibility 0s 350ms, opacity 350ms linear, height 0s 350ms;
+  transition: opacity 350ms linear;
 }
 
 .MuiPaper-root.mostrar {
   height: 100%;
   visibility: visible;
   opacity: 1;
-  transition: opacity 350ms linear;
+  transition: opacity 400ms linear;
 }

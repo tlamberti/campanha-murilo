@@ -6,24 +6,24 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-const Alerta = ({ open, handleDialog, removePessoa }) => {
+const Alerta = ({ open, nao, sim, titulo, descricao }) => {
 
   return (
     <Dialog
       open={open}
-      onClose={handleDialog}
+      onClose={nao}
     >
-      <DialogTitle id="alert-dialog-title">Exclusão</DialogTitle>
+      <DialogTitle id="alert-dialog-title">{titulo}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          Deseja realmente excluir essa pessoa?
+          {descricao}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => removePessoa()} color="primary">
+        <Button onClick={() => sim()} color="primary">
           Sim
         </Button>
-        <Button onClick={() => handleDialog(false)} color="primary" autoFocus>
+        <Button onClick={() => nao(false)} color="primary" autoFocus>
           Não
         </Button>
       </DialogActions>

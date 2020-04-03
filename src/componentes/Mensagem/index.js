@@ -6,10 +6,15 @@ import './style.css';
 
 const Mensagem = ({ texto, tipo, exibicao, onChange }) => {
 
+
   useEffect(() => {
-    setTimeout(() => {
+    const exibition = setTimeout(() => {
       onChange(false)
     }, 2000);
+
+    return () => {
+      clearTimeout(exibition)
+    }
   }, [exibicao])
 
   return (

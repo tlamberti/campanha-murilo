@@ -8,6 +8,9 @@ let collection = develop ? 'develop-pessoas' : 'pessoas';
 
 const ContextProvider = props => {
   const [ open, setOpen ] = useState(false);
+  const [ openDuplicidade, setOpenDuplicidade ] = useState(false);
+  const [ alertaTitulo, setAlertaTitulo ] = useState(false);
+  const [ alertaDescricao, setAlertaDescricao ] = useState(false);
   const [ isLoading, setIsLoading ] = useState(false);
   const [ error, setError ] = useState('');
   const [ sucesso, setSucesso ] = useState('');
@@ -16,6 +19,7 @@ const ContextProvider = props => {
   const [ password, setPassword ] = useState('');
   
   const [ lista, setLista ] = useState();
+  const [ listaPessoasCompleta, setListaPessoasCompleta ] = useState();
 
   // Cadastro de novas pessoas
   const [ user, setUser ] = useState(false);
@@ -87,6 +91,7 @@ const ContextProvider = props => {
             return setLista(filtroPessoas);
           }
 
+        setListaPessoasCompleta(arrPessoasComId)
         setLista(arrPessoasComId || []);
       });
 
@@ -94,36 +99,75 @@ const ContextProvider = props => {
     }
   }, [user.loggedIn])
 
-  function cadastrarPessoa(e) {
-    e.preventDefault();
- 
-    try {  
-      var data = {
-        nome: nome,
-        celular: celular,
-        escritopor: user.email,
-        vinculo: vinculo,
-        idusuario: user.uid
-      };
+  function normalizarTexto(texto) {
+    let textoNormalizado = texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return textoNormalizado;
+  }
 
-      if(idPessoa) {
-        firebaseDatabase.ref(`${collection}/${idPessoa}`)
-        .update(data);
-        setExibeFormulario(false);
-      } else {
-        firebaseDatabase.ref().child(collection)
-        .push(data);
+  function cadastrarPessoa(e, cadastrar) {
+    let mensagens = [];
+
+    if(e) e.preventDefault();
+
+    const semDuplicidade = listaPessoasCompleta.filter(pessoa => {
+      let pessoaNormalizada = normalizarTexto(pessoa.nome).split(' ');
+      let nomeNormalizado = normalizarTexto(nome).split(' ');
+      const verificaNomeSobrenome = pessoaNormalizada[0].includes(nomeNormalizado[0]) && (pessoaNormalizada[1] && pessoaNormalizada[1].includes(nomeNormalizado[1]));
+
+      if (pessoa.celular === celular) {
+        mensagens.push('celular');
+        return pessoa;
+      } else if (verificaNomeSobrenome) {
+        mensagens.push('nome');
+        return pessoa;
+      } 
+    });
+
+    if(!cadastrar && semDuplicidade.length) {
+      let listaNomes = semDuplicidade.map(pessoa => pessoa.nome)
+      let joinMensagens = mensagens.join();
+      let msg = 'Esse número de Celular e Nome consta no(s) seguinte(s) cadastros(s)'
+      setOpenDuplicidade(true);
+      setAlertaTitulo('Duplicidade de Registro');
+      setAlertaDescricao(`
+        ${joinMensagens.includes('celular') && joinMensagens.includes('nome') ? 
+          msg : joinMensagens.includes('celular') ? 
+          'Esse Número de Celular já consta no(s) seguinte(s) cadastro(s)' : 
+          'Esse Nome já consta no(s) seguinte(s) cadastro(s)'}: 
+        ${listaNomes.join(', ')}, deseja continuar?
+      `);
+      return;
+    }
+
+    if(!semDuplicidade.length || cadastrar) {
+      try {  
+        var data = {
+          nome: nome,
+          celular: celular,
+          escritopor: user.email,
+          vinculo: vinculo,
+          idusuario: user.uid
+        };
+  
+        if(idPessoa) {
+          firebaseDatabase.ref(`${collection}/${idPessoa}`)
+          .update(data);
+          setExibeFormulario(false);
+        } else {
+          firebaseDatabase.ref().child(collection)
+          .push(data);
+        }
+  
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setSucesso(idPessoa ? 'Alterado com Sucesso!' : 'Cadastrado com Sucesso!');
+        setNome('');
+        setCelular('');
+        setVinculo('');
+        setIdPessoa(null);
+        setOpenDuplicidade(false);
       }
-
-    } catch (error) {
-      console.error(error)
-    } finally {
-      
-      setSucesso(idPessoa ? 'Alterado com Sucesso!' : 'Cadastrado com Sucesso!');
-      setNome('');
-      setCelular('');
-      setVinculo('');
-      setIdPessoa(null);
     }
   }
 
@@ -152,15 +196,19 @@ const ContextProvider = props => {
   }
 
   function cancelEdit() {
-    setExibeFormulario(false);
     setIdPessoa('');
     setNome('');
     setCelular('');
     setVinculo('');
+    setExibeFormulario(false);
+    setError(false);
   }
 
   function handleExibeFormulario() {
     setExibeFormulario(!exibeFormulario);
+    setNome('');
+    setCelular('');
+    setVinculo('');
   }
 
   function manipulaInput(e, input) {
@@ -184,6 +232,10 @@ const ContextProvider = props => {
     }
   }
     
+  const handleDuplicidade = (condition) => {
+    setOpenDuplicidade(condition);
+  }
+
   const handleDialog = (condition, id) => {
     setOpen(condition);
     setIdAtual(id);
@@ -194,6 +246,7 @@ const ContextProvider = props => {
     value={{
       error,
       open,
+      openDuplicidade,
       isLoading,
       sucesso,
       exibeFormulario,
@@ -206,10 +259,14 @@ const ContextProvider = props => {
       celular,
       escritoPor,
       vinculo,
+      alertaTitulo,
+      alertaDescricao,
 
       setError,
       setOpen,
       setSucesso,
+      setAlertaTitulo,
+      setAlertaDescricao,
       setUsername,
       setPassword,
       onAuthStateChange,
@@ -223,7 +280,8 @@ const ContextProvider = props => {
       manipulaInput,
       setUser,
       handleExibeFormulario,
-      handleDialog
+      handleDialog,
+      handleDuplicidade
     }}
     >
       {props.children}

@@ -30,7 +30,12 @@ const Pessoas = () => {
     setSucesso,
     sucesso,
     open,
-    handleDialog
+    openDuplicidade,
+    cadastrarPessoa,
+    handleDialog,
+    handleDuplicidade,
+    alertaTitulo,
+    alertaDescricao
   } = useContext(Context);
 
   useEffect(() => {
@@ -54,10 +59,25 @@ const Pessoas = () => {
               <Button onClick={requestLogout}>Sair</Button>
             </div>
             {exibeFormulario && <Formulario cancelEdit={cancelEdit} idPessoa={idPessoa} />}
-            {open && <Alerta open={open} handleDialog={handleDialog} removePessoa={removePessoa} />}
+            {openDuplicidade && 
+              <Alerta 
+                open={openDuplicidade} 
+                titulo={alertaTitulo}
+                descricao={alertaDescricao}
+                sim={() => cadastrarPessoa(null, true)} 
+                nao={handleDuplicidade} 
+              />}
+            {open && 
+              <Alerta 
+                open={open} 
+                titulo="Exclusão"
+                descricao="Deseja realmente excluir essa pessoa?"
+                sim={removePessoa} 
+                nao={handleDialog} 
+              />}
             <Mensagem 
               texto={sucesso}
-              tipo="success"
+              tipo={'success'}
               exibicao={sucesso}
               onChange={setSucesso}
             />
