@@ -88,6 +88,7 @@ const ContextProvider = props => {
               if(pessoa.idusuario === user.uid)
                 return pessoa;
             })
+            setListaPessoasCompleta(arrPessoasComId)
             return setLista(filtroPessoas);
           }
 
