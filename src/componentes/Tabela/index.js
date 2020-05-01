@@ -20,6 +20,7 @@ const columns = [
   { id: 'nome', label: 'Nome', minWidth: 170 },
   { id: 'celular', label: 'Celular', minWidth: 150 },
   { id: 'escritopor', label: 'Escrito por', minWidth: 170 },
+  { id: 'status', label: 'Status', minWidth: 170 },
   { id: 'vinculo', label: 'Vínculo', minWidth: 170 },
 ];
 

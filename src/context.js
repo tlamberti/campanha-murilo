@@ -29,6 +29,7 @@ const ContextProvider = props => {
   const [ celular, setCelular ] = useState('');
   const [ escritoPor, setEscritoPor ] = useState('');
   const [ vinculo, setVinculo ] = useState('');
+  const [ statusAtual, setStatusAtual ] = useState('');
   const [ exibeFormulario, setExibeFormulario ] = useState(false);
 
   
@@ -147,6 +148,7 @@ const ContextProvider = props => {
           celular: celular,
           escritopor: user.email,
           vinculo: vinculo,
+          status: statusAtual,
           idusuario: user.uid
         };
   
@@ -226,6 +228,9 @@ const ContextProvider = props => {
       case 'vinculo':
         setVinculo(e)
         break;
+      case 'status':
+        setStatusAtual(e);
+        break;
     
       default:
         console.log('e :', e)
@@ -260,6 +265,7 @@ const ContextProvider = props => {
       celular,
       escritoPor,
       vinculo,
+      statusAtual,
       alertaTitulo,
       alertaDescricao,
 
